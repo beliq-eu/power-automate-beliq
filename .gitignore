@@ -1,0 +1,14 @@
+# Local paconn / python
+.venv/
+__pycache__/
+
+# Smoke-test output
+smoke-out/
+*.tmp
+invoice.xml
+invoice.pdf
+invoice-ubl.xml
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
