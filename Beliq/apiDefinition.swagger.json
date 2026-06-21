@@ -1,0 +1,533 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "beliq",
+    "description": "Generate, validate, parse, and convert EN 16931 e-invoices against authority-pinned, nightly-drift-checked rules. beliq produces and checks the compliant document; transmission, archiving, and tax-authority reporting stay with your access point.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "beliq",
+      "url": "https://beliq.eu",
+      "email": "hello@beliq.eu"
+    }
+  },
+  "host": "api.beliq.eu",
+  "basePath": "/",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/v1/generate": {
+      "post": {
+        "operationId": "GenerateInvoice",
+        "summary": "Generate e-invoice",
+        "description": "Generate a compliant e-invoice from a structured EN 16931 invoice object. Returns the XML document, or a hybrid PDF (Factur-X / ZUGFeRD) when Output is PDF, as binary file content.",
+        "x-ms-visibility": "important",
+        "consumes": ["application/json"],
+        "produces": ["application/pdf", "application/xml"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/GenerateRequest" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The generated e-invoice as binary file content: an XML document, or a hybrid PDF when Output is PDF.",
+            "schema": { "type": "string", "format": "binary" }
+          },
+          "400": {
+            "description": "Validation error in the request body.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "404": {
+            "description": "The referenced PDF template was not found.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "422": {
+            "description": "The invoice failed compliance validation (returned when Verify is enabled).",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "503": {
+            "description": "The validation engine is temporarily unavailable.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "/v1/validate": {
+      "post": {
+        "operationId": "ValidateInvoice",
+        "summary": "Validate e-invoice",
+        "description": "Validate a raw XML or PDF e-invoice against the authority-pinned rules. Returns a structured validation result with errors and warnings.",
+        "x-ms-visibility": "important",
+        "consumes": ["application/xml", "application/pdf"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "The e-invoice document to validate, as raw XML or PDF file content.",
+            "x-ms-summary": "Document",
+            "schema": { "type": "string", "format": "binary" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["auto", "cii", "ubl"],
+            "default": "auto",
+            "description": "Hint the expected XML syntax, or auto-detect it from the document.",
+            "x-ms-summary": "Format",
+            "x-ms-visibility": "advanced"
+          },
+          {
+            "name": "franceCtc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "Also apply the French CTC (Flux 2) Schematron overlay.",
+            "x-ms-summary": "Apply France CTC overlay",
+            "x-ms-visibility": "advanced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The validation result.",
+            "schema": { "$ref": "#/definitions/ValidateResponse" }
+          },
+          "400": {
+            "description": "Missing or unreadable document body.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "422": {
+            "description": "The document could not be processed.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "503": {
+            "description": "The validation engine is temporarily unavailable.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "/v1/parse": {
+      "post": {
+        "operationId": "ParseInvoice",
+        "summary": "Parse e-invoice",
+        "description": "Parse a raw XML or PDF e-invoice into a structured invoice object.",
+        "x-ms-visibility": "important",
+        "consumes": ["application/xml", "application/pdf"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "The e-invoice document to parse, as raw XML or PDF file content.",
+            "x-ms-summary": "Document",
+            "schema": { "type": "string", "format": "binary" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["auto", "cii", "ubl"],
+            "default": "auto",
+            "description": "Hint the expected XML syntax, or auto-detect it from the document.",
+            "x-ms-summary": "Format",
+            "x-ms-visibility": "advanced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The parsed invoice.",
+            "schema": { "$ref": "#/definitions/ParseResponse" }
+          },
+          "400": {
+            "description": "Missing or unreadable document body.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "503": {
+            "description": "The validation engine is temporarily unavailable.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "/v1/convert": {
+      "post": {
+        "operationId": "ConvertInvoice",
+        "summary": "Convert e-invoice",
+        "description": "Convert a raw XML or PDF e-invoice between formats within the EN 16931 family. Returns the converted document as binary file content.",
+        "x-ms-visibility": "important",
+        "consumes": ["application/xml", "application/pdf"],
+        "produces": ["application/pdf", "application/xml"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "The source e-invoice document to convert, as raw XML or PDF file content.",
+            "x-ms-summary": "Document",
+            "schema": { "type": "string", "format": "binary" }
+          },
+          {
+            "name": "targetFormat",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "enum": ["cii", "ubl", "zugferd", "facturx", "xrechnung", "peppol-bis"],
+            "description": "The format to convert the document to.",
+            "x-ms-summary": "Target format"
+          },
+          {
+            "name": "sourceFormat",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["auto", "cii", "ubl", "zugferd", "facturx", "xrechnung", "peppol-bis"],
+            "default": "auto",
+            "description": "The source format, or auto-detect it from the document.",
+            "x-ms-summary": "Source format",
+            "x-ms-visibility": "advanced"
+          },
+          {
+            "name": "targetProfile",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": ["basicwl", "en16931", "extended", "extended-ctc-fr"],
+            "default": "en16931",
+            "description": "The Factur-X / ZUGFeRD profile for the target document. Applies when the target format is Factur-X or ZUGFeRD.",
+            "x-ms-summary": "Target profile",
+            "x-ms-visibility": "advanced"
+          },
+          {
+            "name": "dropFranceCtcOverlay",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "Drop the French CTC overlay when the target format cannot carry it (lossy).",
+            "x-ms-summary": "Drop France CTC overlay",
+            "x-ms-visibility": "advanced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The converted e-invoice as binary file content (XML, or a hybrid PDF for Factur-X / ZUGFeRD targets).",
+            "schema": { "type": "string", "format": "binary" }
+          },
+          "400": {
+            "description": "Missing or unreadable document body, or an unsupported format combination.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "422": {
+            "description": "The source document could not be converted to the requested target.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "500": {
+            "description": "The conversion failed unexpectedly.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "503": {
+            "description": "The conversion engine is temporarily unavailable.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "GetAccount",
+        "summary": "Check API key",
+        "description": "Return the account, plan, and quota context for the calling API key. This call does not consume quota and is a quick way to confirm a connection works.",
+        "x-ms-visibility": "advanced",
+        "produces": ["application/json"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The account, plan, and quota context.",
+            "schema": { "$ref": "#/definitions/AccountResponse" }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          },
+          "403": {
+            "description": "The account is disabled.",
+            "schema": { "$ref": "#/definitions/ErrorResponse" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GenerateRequest": {
+      "type": "object",
+      "required": ["standard", "output", "invoice"],
+      "properties": {
+        "standard": {
+          "type": "string",
+          "enum": ["xrechnung", "zugferd", "facturx", "peppol-bis"],
+          "description": "The e-invoice standard to generate.",
+          "x-ms-summary": "Standard",
+          "x-ms-visibility": "important"
+        },
+        "output": {
+          "type": "string",
+          "enum": ["xml", "pdf"],
+          "description": "Return the structured XML, or a hybrid PDF that embeds the XML (Factur-X / ZUGFeRD).",
+          "x-ms-summary": "Output",
+          "x-ms-visibility": "important"
+        },
+        "facturxProfile": {
+          "type": "string",
+          "enum": ["basicwl", "en16931", "extended", "extended-ctc-fr"],
+          "description": "Data granularity profile for Factur-X / ZUGFeRD output.",
+          "x-ms-summary": "Factur-X profile",
+          "x-ms-visibility": "advanced"
+        },
+        "verify": {
+          "type": "boolean",
+          "description": "Validate the generated document against the authority-pinned rules and return an error if it fails.",
+          "x-ms-summary": "Verify compliance",
+          "x-ms-visibility": "advanced"
+        },
+        "pdfTemplateId": {
+          "type": "string",
+          "description": "Identifier of a saved PDF template to render the visual layer of a hybrid PDF.",
+          "x-ms-summary": "PDF template ID",
+          "x-ms-visibility": "advanced"
+        },
+        "invoice": { "$ref": "#/definitions/Invoice" }
+      }
+    },
+    "Invoice": {
+      "type": "object",
+      "description": "Structured EN 16931 invoice data.",
+      "x-ms-summary": "Invoice",
+      "required": ["number", "issueDate", "currencyCode", "seller", "buyer", "lines", "totalNetAmount", "totalTaxAmount", "totalGrossAmount"],
+      "properties": {
+        "number": { "type": "string", "description": "Invoice number.", "x-ms-summary": "Invoice number" },
+        "issueDate": { "type": "string", "description": "Issue date, YYYY-MM-DD.", "x-ms-summary": "Issue date" },
+        "dueDate": { "type": "string", "description": "Due date, YYYY-MM-DD. Provide this or Payment terms (EN 16931 rule BR-CO-25).", "x-ms-summary": "Due date" },
+        "currencyCode": { "type": "string", "description": "ISO 4217 currency code, e.g. EUR.", "x-ms-summary": "Currency" },
+        "documentType": {
+          "type": "string",
+          "enum": ["invoice", "creditnote"],
+          "description": "Document type. Defaults to invoice.",
+          "x-ms-summary": "Document type",
+          "x-ms-visibility": "advanced"
+        },
+        "buyerReference": { "type": "string", "description": "Buyer reference / Leitweg-ID for public-sector invoices.", "x-ms-summary": "Buyer reference", "x-ms-visibility": "advanced" },
+        "orderReference": { "type": "string", "description": "Purchase order reference.", "x-ms-summary": "Order reference", "x-ms-visibility": "advanced" },
+        "note": { "type": "string", "description": "Free-text invoice note.", "x-ms-summary": "Note", "x-ms-visibility": "advanced" },
+        "seller": { "$ref": "#/definitions/Party" },
+        "buyer": { "$ref": "#/definitions/Party" },
+        "lines": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/InvoiceLine" },
+          "description": "Invoice lines.",
+          "x-ms-summary": "Lines"
+        },
+        "taxSummary": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TaxSummary" },
+          "description": "VAT breakdown per category and rate.",
+          "x-ms-summary": "Tax summary",
+          "x-ms-visibility": "advanced"
+        },
+        "paymentMeans": { "$ref": "#/definitions/PaymentMeans" },
+        "paymentTerms": { "type": "string", "description": "Free-text payment terms. Provide this or Due date.", "x-ms-summary": "Payment terms", "x-ms-visibility": "advanced" },
+        "totalNetAmount": { "type": "number", "description": "Sum of line net amounts.", "x-ms-summary": "Total net" },
+        "totalTaxAmount": { "type": "number", "description": "Total VAT amount.", "x-ms-summary": "Total tax" },
+        "totalGrossAmount": { "type": "number", "description": "Must equal net + tax.", "x-ms-summary": "Total gross" }
+      }
+    },
+    "Party": {
+      "type": "object",
+      "description": "An invoice party (seller or buyer).",
+      "required": ["name", "address"],
+      "properties": {
+        "name": { "type": "string", "x-ms-summary": "Name" },
+        "address": { "$ref": "#/definitions/Address" },
+        "vatId": { "type": "string", "description": "VAT identifier. Required for the seller when a line uses VAT category S.", "x-ms-summary": "VAT ID" },
+        "taxId": { "type": "string", "description": "Tax registration identifier.", "x-ms-summary": "Tax ID", "x-ms-visibility": "advanced" },
+        "registrationId": { "type": "string", "description": "Legal registration identifier.", "x-ms-summary": "Registration ID", "x-ms-visibility": "advanced" },
+        "email": { "type": "string", "x-ms-summary": "Email", "x-ms-visibility": "advanced" },
+        "phone": { "type": "string", "x-ms-summary": "Phone", "x-ms-visibility": "advanced" },
+        "contactName": { "type": "string", "x-ms-summary": "Contact name", "x-ms-visibility": "advanced" }
+      }
+    },
+    "Address": {
+      "type": "object",
+      "description": "A postal address.",
+      "required": ["city", "postalCode", "countryCode"],
+      "properties": {
+        "street": { "type": "string", "x-ms-summary": "Street" },
+        "additionalStreet": { "type": "string", "x-ms-summary": "Additional street", "x-ms-visibility": "advanced" },
+        "city": { "type": "string", "x-ms-summary": "City" },
+        "postalCode": { "type": "string", "x-ms-summary": "Postal code" },
+        "countryCode": { "type": "string", "description": "ISO 3166-1 alpha-2 country code, e.g. DE.", "x-ms-summary": "Country code" },
+        "state": { "type": "string", "x-ms-summary": "State", "x-ms-visibility": "advanced" },
+        "region": { "type": "string", "x-ms-summary": "Region", "x-ms-visibility": "advanced" },
+        "province": { "type": "string", "x-ms-summary": "Province", "x-ms-visibility": "advanced" }
+      }
+    },
+    "InvoiceLine": {
+      "type": "object",
+      "required": ["description", "quantity", "unitCode", "unitPrice", "lineTotal", "vatRate", "vatCategoryCode"],
+      "properties": {
+        "description": { "type": "string", "x-ms-summary": "Description" },
+        "quantity": { "type": "number", "x-ms-summary": "Quantity" },
+        "unitCode": { "type": "string", "description": "UN/ECE unit code, e.g. C62 (piece).", "x-ms-summary": "Unit code" },
+        "unitPrice": { "type": "number", "x-ms-summary": "Unit price" },
+        "lineTotal": { "type": "number", "x-ms-summary": "Line total" },
+        "vatRate": { "type": "number", "description": "VAT rate as a percentage, e.g. 19.", "x-ms-summary": "VAT rate (%)" },
+        "vatCategoryCode": { "type": "string", "description": "VAT category code, e.g. S (standard), Z (zero), E (exempt).", "x-ms-summary": "VAT category" },
+        "itemId": { "type": "string", "description": "Seller item identifier.", "x-ms-summary": "Item ID", "x-ms-visibility": "advanced" },
+        "buyerItemId": { "type": "string", "description": "Buyer item identifier.", "x-ms-summary": "Buyer item ID", "x-ms-visibility": "advanced" }
+      }
+    },
+    "TaxSummary": {
+      "type": "object",
+      "required": ["vatCategoryCode", "vatRate", "taxableAmount", "taxAmount"],
+      "properties": {
+        "vatCategoryCode": { "type": "string", "x-ms-summary": "VAT category" },
+        "vatRate": { "type": "number", "x-ms-summary": "VAT rate (%)" },
+        "taxableAmount": { "type": "number", "x-ms-summary": "Taxable amount" },
+        "taxAmount": { "type": "number", "x-ms-summary": "Tax amount" }
+      }
+    },
+    "PaymentMeans": {
+      "type": "object",
+      "description": "How the invoice should be paid.",
+      "x-ms-summary": "Payment means",
+      "x-ms-visibility": "advanced",
+      "required": ["typeCode"],
+      "properties": {
+        "typeCode": { "type": "string", "description": "UN/ECE 4461 payment means code, e.g. 30 (credit transfer).", "x-ms-summary": "Type code" },
+        "iban": { "type": "string", "x-ms-summary": "IBAN" },
+        "bic": { "type": "string", "x-ms-summary": "BIC" },
+        "bankName": { "type": "string", "x-ms-summary": "Bank name" },
+        "paymentReference": { "type": "string", "x-ms-summary": "Payment reference" }
+      }
+    },
+    "Finding": {
+      "type": "object",
+      "description": "A single validation rule outcome.",
+      "properties": {
+        "ruleId": { "type": "string", "x-ms-summary": "Rule ID" },
+        "severity": { "type": "string", "enum": ["fatal", "error", "warning", "info"], "x-ms-summary": "Severity" },
+        "location": { "type": "string", "description": "XPath or location in the document.", "x-ms-summary": "Location" },
+        "message": { "type": "string", "x-ms-summary": "Message" }
+      }
+    },
+    "ValidateResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "x-ms-summary": "Success" },
+        "data": {
+          "type": "object",
+          "x-ms-summary": "Result",
+          "properties": {
+            "valid": { "type": "boolean", "x-ms-summary": "Valid" },
+            "format": { "type": "string", "description": "Detected syntax, e.g. cii or ubl.", "x-ms-summary": "Format" },
+            "profileDetected": { "type": "string", "x-ms-summary": "Profile detected" },
+            "schematronVersion": { "type": "string", "x-ms-summary": "Schematron version" },
+            "ciusVersion": { "type": "string", "x-ms-summary": "CIUS version" },
+            "peppolVersion": { "type": "string", "x-ms-summary": "Peppol version" },
+            "facturxProfile": { "type": "string", "x-ms-summary": "Factur-X profile" },
+            "facturxVersion": { "type": "string", "x-ms-summary": "Factur-X version" },
+            "franceCtcApplied": { "type": "boolean", "x-ms-summary": "France CTC applied" },
+            "franceCtcVersion": { "type": "string", "x-ms-summary": "France CTC version" },
+            "errors": { "type": "array", "items": { "$ref": "#/definitions/Finding" }, "x-ms-summary": "Errors" },
+            "warnings": { "type": "array", "items": { "$ref": "#/definitions/Finding" }, "x-ms-summary": "Warnings" }
+          }
+        },
+        "error": { "$ref": "#/definitions/ErrorBody" }
+      }
+    },
+    "ParseResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "x-ms-summary": "Success" },
+        "data": {
+          "type": "object",
+          "x-ms-summary": "Result",
+          "properties": {
+            "format": { "type": "string", "description": "Detected syntax, e.g. cii or ubl.", "x-ms-summary": "Format" },
+            "profileDetected": { "type": "string", "x-ms-summary": "Profile detected" },
+            "invoice": { "$ref": "#/definitions/Invoice" }
+          }
+        },
+        "error": { "$ref": "#/definitions/ErrorBody" }
+      }
+    },
+    "AccountResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "x-ms-summary": "Success" },
+        "data": {
+          "type": "object",
+          "x-ms-summary": "Account",
+          "properties": {
+            "keyId": { "type": "string", "x-ms-summary": "Key ID" },
+            "keyPrefix": { "type": "string", "x-ms-summary": "Key prefix" },
+            "org": {
+              "type": "object",
+              "x-ms-summary": "Organization",
+              "properties": {
+                "id": { "type": "string", "x-ms-summary": "ID" },
+                "name": { "type": "string", "x-ms-summary": "Name" }
+              }
+            },
+            "plan": {
+              "type": "object",
+              "x-ms-summary": "Plan",
+              "properties": {
+                "id": { "type": "integer", "x-ms-summary": "ID" },
+                "name": { "type": "string", "x-ms-summary": "Name" }
+              }
+            },
+            "rateLimitPerMinute": { "type": "number", "x-ms-summary": "Rate limit per minute" },
+            "quota": {
+              "type": "object",
+              "x-ms-summary": "Quota",
+              "properties": {
+                "limit": { "type": "integer", "x-ms-summary": "Limit" },
+                "used": { "type": "integer", "x-ms-summary": "Used" },
+                "remaining": { "type": "integer", "x-ms-summary": "Remaining" },
+                "resetsAt": { "type": "string", "x-ms-summary": "Resets at" }
+              }
+            }
+          }
+        },
+        "error": { "$ref": "#/definitions/ErrorBody" }
+      }
+    },
+    "ErrorBody": {
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "x-ms-summary": "Code" },
+        "message": { "type": "string", "x-ms-summary": "Message" },
+        "details": { "type": "object", "x-ms-summary": "Details" }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean", "x-ms-summary": "Success" },
+        "error": { "$ref": "#/definitions/ErrorBody" }
+      }
+    }
+  },
+  "securityDefinitions": {},
+  "security": [],
+  "tags": []
+}

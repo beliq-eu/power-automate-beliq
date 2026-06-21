@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 230" width="230" height="230" role="img" aria-label="beliq">
+  <rect width="230" height="230" rx="40" fill="#e54d0d" />
+  <!-- beliq 3-ring mark (native 180x180), scaled 0.8333 and centered -->
+  <g transform="translate(40 40) scale(0.8333333)" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="90" cy="90" r="80" />
+    <circle cx="90" cy="90" r="56" />
+    <circle cx="90" cy="90" r="32" />
+    <line x1="170" y1="90" x2="170" y2="170" />
+  </g>
+</svg>
