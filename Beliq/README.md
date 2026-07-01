@@ -13,8 +13,9 @@ beliq
 ## Prerequisites
 
 You need a beliq account and an API key. The free tier is enough to evaluate
-the connector. No Power Automate premium license is required to use a custom
-connector (unlike the generic HTTP action).
+the connector. Flows that use a custom connector need a Power Automate Premium
+plan; that is a Power Automate platform requirement for every custom connector,
+not specific to beliq.
 
 ## Obtaining credentials
 
