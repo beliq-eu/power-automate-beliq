@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "beliq",
+    "title": "beliq (Independent Publisher)",
     "description": "Generate, validate, parse, and convert EN 16931 e-invoices against authority-pinned, nightly-drift-checked rules. beliq produces and checks the compliant document; transmission, archiving, and tax-authority reporting stay with your access point.",
     "version": "1.0.0",
     "contact": {
@@ -15,6 +15,11 @@
   "schemes": ["https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
+  "x-ms-connector-metadata": [
+    { "propertyName": "Website", "propertyValue": "https://beliq.eu" },
+    { "propertyName": "Privacy policy", "propertyValue": "https://beliq.eu/legal/privacy-policy/" },
+    { "propertyName": "Categories", "propertyValue": "Content and Files;Finance" }
+  ],
   "paths": {
     "/v1/generate": {
       "post": {

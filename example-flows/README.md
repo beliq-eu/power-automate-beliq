@@ -10,10 +10,10 @@ API.
 | `2-generate-facturx-pdf.json` | Generate e-invoice | The same invoice generated as a Factur-X hybrid PDF, with `verify` enabled. |
 
 The **Validate**, **Parse**, and **Convert** actions take a raw XML or PDF
-document as the body rather than JSON, so they have no example file here. The
-easiest source of a valid document is the output of **Generate e-invoice**:
-run the XRechnung body above, then feed the returned XML into Validate, Parse,
-or Convert.
+document as the body rather than JSON. The easiest source of a valid document
+is the output of **Generate e-invoice**: run the XRechnung body above, then
+feed the returned XML into Validate, Parse, or Convert. The `curl` block below
+runs that whole chain end to end.
 
 ## Using one in a flow
 
@@ -30,8 +30,8 @@ a preceding **Generate** action.
 
 ## Testing the bodies directly
 
-The same bodies work against the API with `curl`. Generate returns the document
-on stdout; Validate returns JSON.
+The same bodies work against the API with `curl`. Generate and Convert return
+the document; Validate and Parse return JSON.
 
 ```bash
 # Generate XRechnung XML
@@ -54,6 +54,13 @@ curl -sS \
   -H "Content-Type: application/xml" \
   --data-binary @invoice.xml \
   "https://api.beliq.eu/v1/validate?format=auto"
+
+# Parse the generated XML into structured JSON
+curl -sS \
+  -H "Authorization: Bearer $BELIQ_API_KEY" \
+  -H "Content-Type: application/xml" \
+  --data-binary @invoice.xml \
+  "https://api.beliq.eu/v1/parse?format=auto"
 
 # Convert the XML to UBL
 curl -sS -D - -o invoice-ubl.xml \
