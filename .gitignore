@@ -12,3 +12,8 @@ invoice-ubl.xml
 # OS / editor cruft
 .DS_Store
 Thumbs.db
+
+# Local secrets
+.env
+.env.*
+!.env.example
