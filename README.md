@@ -58,9 +58,29 @@ parameter). A `setheader` policy in `apiProperties.json` builds the
 
 ## Validate
 
+CI runs two offline checks on every push and pull request
+(`.github/workflows/ci.yml`):
+
 ```bash
-# paconn from a throwaway venv
-python3 -m venv .venv && . .venv/bin/activate && pip install paconn
+python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
+python scripts/check_connector.py   # definition, properties, example bodies
+bash scripts/scrub-check.sh         # no em-dash in published text
+```
+
+`scripts/check_connector.py` validates the Swagger 2.0 document, resolves the
+paths in `settings.json`, pins the host and scheme, requires a `summary` and a
+`description` on every operation, resolves every `$ref` and reports any
+definition no operation reaches, checks that the bearer policy reads a
+connection parameter that is declared, and validates each `example-flows/*.json`
+against the `GenerateInvoice` request schema the connector publishes.
+
+`paconn validate` is the vendor's own check and is worth running before a
+submission, but it signs in to Power Platform first and exits 0 when that login
+fails, so it cannot gate a pull request:
+
+```bash
+pip install paconn
+paconn login
 paconn validate --api-def Beliq/apiDefinition.swagger.json
 ```
 
@@ -71,8 +91,8 @@ against the live API.
 
 ## Status and follow-ups
 
-Done: connector definition, properties, icon, READMEs, and two Generate example
-bodies, schema-validated with `paconn validate`.
+Done: connector definition, properties, icon, READMEs, two Generate example
+bodies, and CI that checks all of them offline on every pull request.
 
 Not done yet (tracked as follow-ups):
 
