@@ -103,3 +103,7 @@ Not done yet (tracked as follow-ups):
 - Independent Publisher submission PR to `microsoft/PowerPlatformConnectors`
   (PR titled "beliq (Independent Publisher)"; the README must include
   screenshots of operations succeeding in flows).
+
+## License
+
+MIT
