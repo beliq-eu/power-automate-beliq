@@ -373,7 +373,18 @@
         "registrationId": { "type": "string", "description": "Legal registration identifier.", "x-ms-summary": "Registration ID", "x-ms-visibility": "advanced" },
         "email": { "type": "string", "x-ms-summary": "Email", "x-ms-visibility": "advanced" },
         "phone": { "type": "string", "x-ms-summary": "Phone", "x-ms-visibility": "advanced" },
-        "contactName": { "type": "string", "x-ms-summary": "Contact name", "x-ms-visibility": "advanced" }
+        "contactName": { "type": "string", "x-ms-summary": "Contact name", "x-ms-visibility": "advanced" },
+        "peppol": { "$ref": "#/definitions/PeppolEndpoint" }
+      }
+    },
+    "PeppolEndpoint": {
+      "type": "object",
+      "description": "The party's electronic address (EN 16931 BT-34 seller / BT-49 buyer). Honoured on every standard. Peppol BIS and XRechnung reject a party they cannot address: they fall back to Email, then to VAT ID plus a supported country, and fail otherwise.",
+      "required": ["schemeId", "id"],
+      "x-ms-visibility": "advanced",
+      "properties": {
+        "schemeId": { "type": "string", "description": "OpenPeppol EAS code, four characters. For example 0088 for a GLN or 9930 for a German VAT identifier. An unknown or retired code is rejected.", "x-ms-summary": "Scheme ID" },
+        "id": { "type": "string", "description": "The identifier value within that scheme.", "x-ms-summary": "Electronic address" }
       }
     },
     "Address": {
