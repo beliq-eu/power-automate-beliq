@@ -180,6 +180,47 @@ def check_examples(swagger: dict, parsed: dict[Path, object]) -> None:
             fail(f"{path.relative_to(ROOT)}: {location}: {error.message}")
 
 
+def check_example_invoices(parsed: dict[Path, object]) -> None:
+    """The example bodies have to clear the XRechnung CIUS, not just the schema.
+
+    `verify` defaults to true, so an invoice that satisfies plain EN 16931 and
+    nothing more comes back 422 INVALID_INVOICE. Each check names the rule the
+    field answers. Both bodies were proven live (2026-09-06).
+    """
+    for path in sorted(p for p in parsed if p.parent == EXAMPLES):
+        body = parsed[path]
+        if not isinstance(body, dict) or "invoice" not in body:
+            continue
+        invoice = body["invoice"]
+        name = path.relative_to(ROOT)
+        seller = invoice.get("seller", {})
+        if not seller.get("contactName") or not seller.get("phone"):
+            fail(f"{name}: seller needs contactName and phone, the BG-6 contact group (BR-DE-2)")
+        if not invoice.get("paymentMeans", {}).get("typeCode"):
+            fail(f"{name}: needs paymentMeans, the BG-16 payment instructions (BR-DE-1)")
+        breakdown = invoice.get("taxSummary") or []
+        if not breakdown:
+            fail(f"{name}: needs taxSummary, the BG-23 VAT breakdown (BR-CO-18)")
+        for line in invoice.get("lines", []):
+            if not any(
+                t.get("vatCategoryCode") == line.get("vatCategoryCode")
+                and t.get("vatRate") == line.get("vatRate")
+                for t in breakdown
+            ):
+                fail(
+                    f"{name}: line {line.get('description')!r} has no matching taxSummary "
+                    "entry (BR-S-01)"
+                )
+        if not invoice.get("buyerReference"):
+            fail(f"{name}: needs buyerReference (BR-DE-15)")
+        # BT-34 / BT-49. Resolution order is `peppol`, then `email` as EAS `EM`,
+        # then `vatId` plus country; any rung addresses a party on xrechnung.
+        for role in ("seller", "buyer"):
+            party = invoice.get(role, {})
+            if not (party.get("peppol") or party.get("email") or party.get("vatId")):
+                fail(f"{name}: {role} has no electronic address the standard can resolve")
+
+
 def main() -> int:
     parsed = check_json_parses()
     if failures:
@@ -194,6 +235,7 @@ def main() -> int:
     check_refs(swagger)
     check_auth_wiring(parsed[PROPERTIES], swagger)
     check_examples(swagger, parsed)
+    check_example_invoices(parsed)
 
     report()
     return 1 if failures else 0
