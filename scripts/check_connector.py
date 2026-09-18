@@ -221,6 +221,46 @@ def check_example_invoices(parsed: dict[Path, object]) -> None:
                 fail(f"{name}: {role} has no electronic address the standard can resolve")
 
 
+def check_pdf_visual(swagger: dict, parsed: dict[Path, object]) -> None:
+    """PDF output has to name a visual, and the connector has one way to do it.
+
+    XRechnung and Peppol BIS have no hybrid PDF, so the API routes them to a
+    visualization render and answers 400 unless the request carries `template`
+    or `pdfTemplateId`. A declarative connector cannot branch on another field,
+    so `template` is declared hidden with a default and Power Automate sends it
+    on every Generate call. Drop the default or make the field visible and
+    Output=PDF silently starts failing again for two of the four standards.
+    """
+    field = swagger.get("definitions", {}).get("GenerateRequest", {}).get("properties", {}).get(
+        "template"
+    )
+    if not isinstance(field, dict):
+        fail("apiDefinition: GenerateRequest declares no 'template', so PDF output has no visual")
+    else:
+        if field.get("default") != "standard":
+            fail(
+                "apiDefinition: GenerateRequest.template default is "
+                f"{field.get('default')!r}, expected 'standard' (nothing else sends it)"
+            )
+        if field.get("x-ms-visibility") != "internal":
+            fail(
+                "apiDefinition: GenerateRequest.template x-ms-visibility is "
+                f"{field.get('x-ms-visibility')!r}, expected 'internal' so it is always sent"
+            )
+
+    # The example bodies are curl payloads too, and curl gets no designer
+    # default, so a PDF body has to carry the visual itself.
+    for path in sorted(p for p in parsed if p.parent == EXAMPLES):
+        body = parsed[path]
+        if not isinstance(body, dict) or body.get("output") != "pdf":
+            continue
+        if not (body.get("template") or body.get("pdfTemplateId")):
+            fail(
+                f"{path.relative_to(ROOT)}: output is pdf but the body names no visual "
+                "(template or pdfTemplateId), so the curl chain 400s on an XML-only standard"
+            )
+
+
 def main() -> int:
     parsed = check_json_parses()
     if failures:
@@ -236,6 +276,7 @@ def main() -> int:
     check_auth_wiring(parsed[PROPERTIES], swagger)
     check_examples(swagger, parsed)
     check_example_invoices(parsed)
+    check_pdf_visual(swagger, parsed)
 
     report()
     return 1 if failures else 0

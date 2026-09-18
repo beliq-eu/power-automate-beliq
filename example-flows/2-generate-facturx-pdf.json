@@ -2,6 +2,7 @@
   "standard": "facturx",
   "output": "pdf",
   "facturxProfile": "en16931",
+  "template": "standard",
   "verify": true,
   "invoice": {
     "number": "INV-2026-002",
