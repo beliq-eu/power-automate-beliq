@@ -25,7 +25,7 @@
       "post": {
         "operationId": "GenerateInvoice",
         "summary": "Generate e-invoice",
-        "description": "Generate a compliant e-invoice from a structured EN 16931 invoice object. Returns the XML document, or a hybrid PDF (Factur-X / ZUGFeRD) when Output is PDF, as binary file content.",
+        "description": "Generate a compliant e-invoice from a structured EN 16931 invoice object. Returns the XML document, or a PDF when Output is PDF, as binary file content. The PDF is a hybrid PDF/A-3 with the XML embedded on Factur-X and ZUGFeRD, and a visualization with no embedded XML on XRechnung and Peppol BIS.",
         "x-ms-visibility": "important",
         "consumes": ["application/json"],
         "produces": ["application/pdf", "application/xml"],
@@ -39,7 +39,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The generated e-invoice as binary file content: an XML document, or a hybrid PDF when Output is PDF.",
+            "description": "The generated e-invoice as binary file content: an XML document, or a PDF when Output is PDF.",
             "schema": { "type": "string", "format": "binary" }
           },
           "400": {
@@ -286,7 +286,7 @@
         "output": {
           "type": "string",
           "enum": ["xml", "pdf"],
-          "description": "Return the structured XML, or a hybrid PDF that embeds the XML (Factur-X / ZUGFeRD).",
+          "description": "Return the structured XML, or a PDF. Factur-X and ZUGFeRD return a hybrid PDF/A-3 with the XML embedded. XRechnung and Peppol BIS have no hybrid form, so they return a visualization with no XML inside it, and their legal document stays the XML.",
           "x-ms-summary": "Output",
           "x-ms-visibility": "important"
         },
@@ -310,9 +310,17 @@
           "x-ms-summary": "Verify compliance",
           "x-ms-visibility": "advanced"
         },
+        "template": {
+          "type": "string",
+          "enum": ["standard"],
+          "default": "standard",
+          "description": "Render the built-in default visual for PDF output. XRechnung and Peppol BIS have no hybrid PDF, so the API refuses PDF for them unless the request names a visual; Factur-X and ZUGFeRD render theirs either way. Hidden and always sent, because a declarative connector has no other way to ask for one.",
+          "x-ms-summary": "PDF visual",
+          "x-ms-visibility": "internal"
+        },
         "pdfTemplateId": {
           "type": "string",
-          "description": "Identifier of a saved PDF template to render the visual layer of a hybrid PDF.",
+          "description": "Identifier of a saved PDF template to render the PDF visual. Takes precedence over the built-in default.",
           "x-ms-summary": "PDF template ID",
           "x-ms-visibility": "advanced"
         },

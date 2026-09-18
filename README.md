@@ -29,7 +29,7 @@ example-flows/                 the two Generate bodies + curl smoke commands
 
 One connector, five actions:
 
-- **Generate e-invoice** -> `POST /v1/generate` (JSON body, returns XML or hybrid PDF)
+- **Generate e-invoice** -> `POST /v1/generate` (JSON body, returns XML or PDF: a hybrid PDF/A-3 on Factur-X and ZUGFeRD, a visualization with no embedded XML on XRechnung and Peppol BIS)
 - **Validate e-invoice** -> `POST /v1/validate` (raw XML/PDF body, returns JSON)
 - **Parse e-invoice** -> `POST /v1/parse` (raw XML/PDF body, returns JSON)
 - **Convert e-invoice** -> `POST /v1/convert` (raw XML/PDF body, returns the converted document)
