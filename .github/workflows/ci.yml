@@ -24,5 +24,5 @@ jobs:
       - name: Scrub check (no em-dash)
         run: bash scripts/scrub-check.sh
 
-  public-scrub:
-    uses: beliq-eu/.github/.github/workflows/public-scrub.yml@main
+  guard:
+    uses: beliq-eu/.github/.github/workflows/guard.yml@5e16a1d6d111632323ef4d63e64302a681b501e9 # main
