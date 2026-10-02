@@ -40,7 +40,7 @@ summary, payment means, totals) as typed fields, so flow authors get rich field
 mapping. Validate / Parse / Convert take the document as the raw request body.
 
 The format option lists are the live, publicly-offered subset of the beliq
-coverage manifest. They are kept in sync with the `n8n-nodes-beliq`
+coverage manifest, which `GET https://api.beliq.eu/v1/rulesets` publishes. They are kept in sync with the `n8n-nodes-beliq`
 node; provisional formats are withheld from the dropdowns.
 
 ## Authentication
