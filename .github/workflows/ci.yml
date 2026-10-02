@@ -23,3 +23,6 @@ jobs:
         run: python scripts/check_connector.py
       - name: Scrub check (no em-dash)
         run: bash scripts/scrub-check.sh
+
+  public-scrub:
+    uses: beliq-eu/.github/.github/workflows/public-scrub.yml@main
