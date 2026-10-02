@@ -143,7 +143,7 @@
             "type": "string",
             "enum": ["auto", "cii", "ubl"],
             "default": "auto",
-            "description": "Hint the expected XML syntax, or auto-detect it from the document.",
+            "description": "Checked against the allowed values, otherwise ignored. Detection is always automatic: the syntax is read from the document itself.",
             "x-ms-summary": "Format",
             "x-ms-visibility": "advanced"
           }
