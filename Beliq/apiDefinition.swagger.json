@@ -278,8 +278,8 @@
       "properties": {
         "standard": {
           "type": "string",
-          "enum": ["xrechnung", "zugferd", "facturx", "peppol-bis"],
-          "description": "The e-invoice standard to generate.",
+          "enum": ["xrechnung", "zugferd", "facturx", "peppol-bis", "fatturapa", "facturae", "eslog", "ksef"],
+          "description": "The e-invoice standard to generate. xrechnung, zugferd, facturx and peppol-bis are Authority-checked: validated against the authority's own rules. fatturapa, facturae, eslog and ksef are Schema-checked: structure only, no business rules, because their authority publishes no machine-readable business rules. GET /v1/rulesets carries each format's badge.",
           "x-ms-summary": "Standard",
           "x-ms-visibility": "important"
         },
