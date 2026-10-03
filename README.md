@@ -39,9 +39,14 @@ The Generate body models the core EN 16931 invoice (seller, buyer, lines, tax
 summary, payment means, totals) as typed fields, so flow authors get rich field
 mapping. Validate / Parse / Convert take the document as the raw request body.
 
-The format option lists are the live, publicly-offered subset of the beliq
-coverage manifest, which `GET https://api.beliq.eu/v1/rulesets` publishes. They are kept in sync with the `n8n-nodes-beliq`
-node; provisional formats are withheld from the dropdowns.
+The format option lists carry every value the API accepts for each operation,
+which is also every format `GET https://api.beliq.eu/v1/rulesets` publishes.
+Each format wears a badge saying how deep its check goes: XRechnung, ZUGFeRD,
+Factur-X and Peppol BIS are Authority-checked, and FatturaPA, Facturae, e-SLOG
+and KSeF FA(3) are Schema-checked, meaning structure only, because their
+authority publishes no machine-readable business rules. The convert source and
+target lists are shorter than the generate list because the API's own convert
+enums are: no national format is a conversion target.
 
 ## Authentication
 
