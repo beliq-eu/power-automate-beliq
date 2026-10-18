@@ -40,8 +40,10 @@ Use **Check API key** (no quota cost) to confirm the connection works.
 
 Generate targets **XRechnung**, **ZUGFeRD**, **Factur-X**, and **Peppol BIS**.
 Convert moves between **CII**, **UBL**, **ZUGFeRD**, **Factur-X**, **XRechnung**,
-and **Peppol BIS**. Validate and parse accept **CII** and **UBL** syntaxes, or
-auto-detect from the document.
+and **Peppol BIS**. Validate and parse accept **CII** and **UBL** syntaxes. Validate
+takes the syntax as a hint or auto-detects it from the document. Parse always reads
+the syntax from the document itself: its format parameter is checked against the
+allowed values and otherwise has no effect.
 
 ### Input and output
 
