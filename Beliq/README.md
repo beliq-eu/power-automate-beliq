@@ -1,10 +1,13 @@
 # beliq
 
-[beliq](https://beliq.eu) is an EU e-invoicing compliance API. It generates,
-validates, parses, and converts EN 16931 invoices against authority-pinned,
-nightly-drift-checked rules. beliq produces and checks the compliant document;
-transmission, archiving, and tax-authority reporting stay with your access
-point.
+Validate, generate, convert and parse EU e-invoices with the
+[beliq](https://beliq.eu) API from Power Automate, Power Apps and Copilot
+Studio. How deep a check goes differs by format:
+[`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
+needed) lists each format's rule pack, version and badge, and
+[How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
+explains each depth. beliq produces and checks the document; transmission,
+archiving, and tax-authority reporting stay with your access point.
 
 ## Publisher
 
@@ -30,20 +33,21 @@ Use **Check API key** (no quota cost) to confirm the connection works.
 
 | Operation | What it does |
 | --- | --- |
-| **Generate e-invoice** | Build a compliant e-invoice from a structured EN 16931 invoice object. Returns the XML, or a hybrid PDF (Factur-X / ZUGFeRD) when Output is PDF. |
-| **Validate e-invoice** | Check a raw XML or PDF e-invoice against the authority-pinned rules. Returns a structured result with errors and warnings. |
+| **Generate e-invoice** | Build an e-invoice from a structured EN 16931 invoice object. Returns the XML, or a hybrid PDF (Factur-X / ZUGFeRD) when Output is PDF. |
+| **Validate e-invoice** | Check a raw XML or PDF e-invoice against the rule packs and schemas the API lists for its format; for a PDF, the verdict is about its embedded XML. Returns a structured result with errors and warnings. |
 | **Parse e-invoice** | Read a raw XML or PDF e-invoice into a structured invoice object. |
 | **Convert e-invoice** | Convert a raw XML or PDF e-invoice between formats within the EN 16931 family. |
 | **Check API key** | Return the account, plan, and quota context for the calling key. Does not consume quota. |
 
 ### Formats
 
-Generate targets **XRechnung**, **ZUGFeRD**, **Factur-X**, and **Peppol BIS**.
-Convert moves between **CII**, **UBL**, **ZUGFeRD**, **Factur-X**, **XRechnung**,
-and **Peppol BIS**. Validate and parse accept **CII** and **UBL** syntaxes. Validate
-takes the syntax as a hint or auto-detects it from the document. Parse always reads
-the syntax from the document itself: its format parameter is checked against the
-allowed values and otherwise has no effect.
+Generate offers every standard `POST /v1/generate` accepts, in its **Standard**
+list. Convert moves between **CII**, **UBL**, **ZUGFeRD**, **Factur-X**, **XRechnung**,
+and **Peppol BIS**. Validate detects the format from the document, including the
+national formats the API validates, and its format hint offers only auto, **CII**
+and **UBL**. Parse reads **CII** and **UBL**, also from a ZUGFeRD or Factur-X PDF.
+It always reads the syntax from the document itself: its format parameter is
+checked against the allowed values and otherwise has no effect.
 
 ### Input and output
 

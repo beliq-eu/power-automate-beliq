@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "beliq",
-    "description": "Generate, validate, parse, and convert EN 16931 e-invoices against authority-pinned, nightly-drift-checked rules. beliq produces and checks the compliant document; transmission, archiving, and tax-authority reporting stay with your access point.",
+    "description": "Validate, generate, convert and parse EU e-invoices with the beliq API from Power Automate, Power Apps and Copilot Studio. How deep a check goes differs by format: GET https://api.beliq.eu/v1/rulesets (no API key needed) lists each format's rule pack, version and badge. beliq produces and checks the document; transmission, archiving, and tax-authority reporting stay with your access point.",
     "version": "1.1.0",
     "contact": {
       "name": "beliq",
@@ -25,7 +25,7 @@
       "post": {
         "operationId": "GenerateInvoice",
         "summary": "Generate e-invoice",
-        "description": "Generate a compliant e-invoice from a structured EN 16931 invoice object. Returns the XML document, or a PDF when Output is PDF, as binary file content. The PDF is a hybrid PDF/A-3 with the XML embedded on Factur-X and ZUGFeRD, and a visualization with no embedded XML on XRechnung and Peppol BIS.",
+        "description": "Generate an e-invoice from a structured EN 16931 invoice object. Returns the XML document, or a PDF when Output is PDF, as binary file content. The PDF is a hybrid PDF/A-3 with the XML embedded on Factur-X and ZUGFeRD, and a visualization with no embedded XML on XRechnung and Peppol BIS.",
         "x-ms-visibility": "important",
         "consumes": ["application/json"],
         "produces": ["application/pdf", "application/xml"],
@@ -51,7 +51,7 @@
             "schema": { "$ref": "#/definitions/ErrorResponse" }
           },
           "422": {
-            "description": "The invoice failed compliance validation (returned when Verify is enabled).",
+            "description": "The generated invoice failed validation against the rule packs and schemas the API lists for its standard (returned when Verify is enabled).",
             "schema": { "$ref": "#/definitions/ErrorResponse" }
           },
           "503": {
@@ -65,7 +65,7 @@
       "post": {
         "operationId": "ValidateInvoice",
         "summary": "Validate e-invoice",
-        "description": "Validate a raw XML or PDF e-invoice against the authority-pinned rules. Returns a structured validation result with errors and warnings.",
+        "description": "Validate a raw XML or PDF e-invoice against the rule packs and schemas the API lists for its format. For a PDF, the verdict is about its embedded XML, and the PDF itself is not checked. Returns a structured validation result with errors and warnings. How deep the check goes differs by format: GET https://api.beliq.eu/v1/rulesets lists each format's badge, and https://docs.beliq.eu/compliance/how-verification-works/ explains each depth.",
         "x-ms-visibility": "important",
         "consumes": ["application/xml", "application/pdf"],
         "produces": ["application/json"],
@@ -224,7 +224,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The converted e-invoice as binary file content (XML, or a hybrid PDF for Factur-X / ZUGFeRD targets).",
+            "description": "The converted e-invoice as binary file content. It is XML, except that a hybrid PDF source sent for a Factur-X or ZUGFeRD target returns a PDF. An XML source sent for a Factur-X or ZUGFeRD target returns CII XML, not a PDF. The PDF is the one sent, with only its annotation flags normalised for PDF/A, when its embedded XML already is the target: that XML was checked and the PDF container was not. Otherwise it is that PDF re-wrapped around the converted XML, returned only after veraPDF passed it against PDF/A-3b. With a test key the PDF is watermarked last, after any veraPDF check. Detail: https://docs.beliq.eu/api-reference/convert/#a-pdf-sent-for-a-zugferd-or-factur-x-target",
             "schema": { "type": "string", "format": "binary" }
           },
           "400": {
@@ -279,7 +279,7 @@
         "standard": {
           "type": "string",
           "enum": ["xrechnung", "zugferd", "facturx", "peppol-bis", "fatturapa", "facturae", "eslog", "ksef"],
-          "description": "The e-invoice standard to generate. xrechnung, zugferd, facturx and peppol-bis are Authority-checked: validated against the authority's own rules. fatturapa, facturae, eslog and ksef are Schema-checked: structure only, no business rules, because their authority publishes no machine-readable business rules. GET /v1/rulesets carries each format's badge.",
+          "description": "The e-invoice standard to generate. How deep beliq's check of each goes differs by format: GET https://api.beliq.eu/v1/rulesets (no API key needed) lists each format's rule pack, version and badge, and https://docs.beliq.eu/compliance/how-verification-works/ explains each depth.",
           "x-ms-summary": "Standard",
           "x-ms-visibility": "important"
         },
@@ -306,8 +306,8 @@
         },
         "verify": {
           "type": "boolean",
-          "description": "Validate the generated document against the authority-pinned rules and return an error if it fails.",
-          "x-ms-summary": "Verify compliance",
+          "description": "Validate the generated document against the rule packs and schemas the API lists for its standard, and return an error if it fails.",
+          "x-ms-summary": "Verify",
           "x-ms-visibility": "advanced"
         },
         "template": {
@@ -467,7 +467,7 @@
           "type": "object",
           "x-ms-summary": "Result",
           "properties": {
-            "valid": { "type": "boolean", "x-ms-summary": "Valid" },
+            "valid": { "type": "boolean", "description": "The API's verdict: true when the document passed the rule packs and schemas the API lists for its format, in the stated versions. It does not mean every recipient, validation tool or tax authority accepts it. How deep the check went differs by format: GET https://api.beliq.eu/v1/rulesets lists each format's badge, and https://docs.beliq.eu/compliance/how-verification-works/ explains each depth. When the France CTC (Flux 2) rules ran and one fired, Warnings holds an info entry with rule ID FRANCE_CTC_FINDINGS_BLOCK_TRANSMISSION that names them, whatever Valid says.", "x-ms-summary": "Valid" },
             "format": { "type": "string", "description": "Detected syntax, e.g. cii or ubl.", "x-ms-summary": "Format" },
             "profileDetected": { "type": "string", "x-ms-summary": "Profile detected" },
             "schematronVersion": { "type": "string", "x-ms-summary": "Schematron version" },

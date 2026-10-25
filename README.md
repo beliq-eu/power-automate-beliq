@@ -39,14 +39,20 @@ The Generate body models the core EN 16931 invoice (seller, buyer, lines, tax
 summary, payment means, totals) as typed fields, so flow authors get rich field
 mapping. Validate / Parse / Convert take the document as the raw request body.
 
-The format option lists carry every value the API accepts for each operation,
-which is also every format `GET https://api.beliq.eu/v1/rulesets` publishes.
-Each format wears a badge saying how deep its check goes: XRechnung, ZUGFeRD,
-Factur-X and Peppol BIS are Authority-checked, and FatturaPA, Facturae, e-SLOG
-and KSeF FA(3) are Schema-checked, meaning structure only, because their
-authority publishes no machine-readable business rules. The convert source and
-target lists are shorter than the generate list because the API's own convert
-enums are: no national format is a conversion target.
+The Generate standard list carries every standard the API accepts. With NLCIUS,
+reached through the National profile field, that is every format
+`GET https://api.beliq.eu/v1/rulesets` publishes. The convert
+source and target lists are shorter because the API's own convert enums are: no
+national format is a conversion target. The Validate and Parse format hints
+carry auto, CII and UBL only, while the API's enums also name the national
+formats. With auto, Validate detects those from the document; Parse reads CII
+and UBL only, whatever the hint says.
+
+How deep beliq's check goes differs by format. The connector types no badge:
+[`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
+needed) lists each format's rule pack, version and badge, and
+[How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
+explains each depth.
 
 ## Authentication
 
