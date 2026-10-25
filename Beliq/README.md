@@ -1,10 +1,10 @@
 # beliq
 
 Validate, generate, convert and parse EU e-invoices with the
-[beliq](https://beliq.eu) API from Power Automate, Power Apps and Copilot
-Studio. How deep a check goes differs by format:
+[beliq](https://beliq.eu) API through this connector. How deep a check goes
+differs by format:
 [`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
-needed) lists each format's rule pack, version and badge, and
+needed) lists the rule pack, version and badge of each format beliq offers, and
 [How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
 explains each depth. beliq produces and checks the document; transmission,
 archiving, and tax-authority reporting stay with your access point.
@@ -42,7 +42,8 @@ Use **Check API key** (no quota cost) to confirm the connection works.
 ### Formats
 
 Generate offers every standard `POST /v1/generate` accepts, in its **Standard**
-list. Convert moves between **CII**, **UBL**, **ZUGFeRD**, **Factur-X**, **XRechnung**,
+list; `GET /v1/rulesets`, linked above, shows each of them before you install.
+Convert moves between **CII**, **UBL**, **ZUGFeRD**, **Factur-X**, **XRechnung**,
 and **Peppol BIS**. Validate detects the format from the document, including the
 national formats the API validates, and its format hint offers only auto, **CII**
 and **UBL**. Parse reads **CII** and **UBL**, also from a ZUGFeRD or Factur-X PDF.
@@ -71,6 +72,10 @@ checked against the allowed values and otherwise has no effect.
   that fails validation returns an error.
 - The connector models the core EN 16931 invoice fields. Country-specific
   extensions are accepted by the API but are not surfaced as typed fields.
+- The **Validate** result in this definition names the verdict, the detected
+  format and profile, some of the version fields, and the errors and warnings.
+  The API's response carries more, such as the badge (`verificationBadgeLabel`)
+  and the ruleset fields, which this definition does not name yet.
 
 ## Authentication
 

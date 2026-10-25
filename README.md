@@ -46,11 +46,15 @@ source and target lists are shorter because the API's own convert enums are: no
 national format is a conversion target. The Validate and Parse format hints
 carry auto, CII and UBL only, while the API's enums also name the national
 formats. With auto, Validate detects those from the document; Parse reads CII
-and UBL only, whatever the hint says.
+and UBL only, whatever the hint says. Widening the two enums changes the
+definition's shape, and so does naming the rest of the API's Validate response,
+such as the badge and ruleset fields. Both wait for the live import under
+[Status and follow-ups](#status-and-follow-ups), the first run of the connector
+in a tenant.
 
 How deep beliq's check goes differs by format. The connector types no badge:
 [`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
-needed) lists each format's rule pack, version and badge, and
+needed) lists the rule pack, version and badge of each format beliq offers, and
 [How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
 explains each depth.
 
