@@ -51,7 +51,7 @@
             "schema": { "$ref": "#/definitions/ErrorResponse" }
           },
           "422": {
-            "description": "The request did not produce a document, and error.code says why, for example INVALID_INVOICE or PDFA_VIOLATION. Every code is listed in the generate reference (https://docs.beliq.eu/api-reference/generate/#error-responses).",
+            "description": "The request did not produce a document, and error.code says why. The generate reference lists every code (https://docs.beliq.eu/api-reference/generate/#error-responses).",
             "schema": { "$ref": "#/definitions/ErrorResponse" }
           },
           "503": {
