@@ -25,4 +25,4 @@ jobs:
         run: bash scripts/scrub-check.sh
 
   guard:
-    uses: beliq-eu/.github/.github/workflows/guard.yml@e9db7765063f11c1d61258df8bb2119c5d92c961 # main
+    uses: beliq-eu/.github/.github/workflows/guard.yml@15b7fde24ab32edbb46f7b4f868df62da5279efa # main
