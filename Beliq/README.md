@@ -68,8 +68,12 @@ checked against the allowed values and otherwise has no effect.
   `X-Source-Format` and `X-Target-Format` response headers.
 - E-invoices follow EN 16931. At minimum provide a due date or payment terms
   (rule BR-CO-25), the seller VAT ID when a line uses VAT category `S`, and
-  consistent totals (net + tax = gross). With **Verify** enabled, a document
-  that fails validation returns an error.
+  consistent totals (net + tax = gross). **Verify** is on unless you set it to
+  false, so a generated document that fails validation returns an error.
+- The connector cannot carry a VAT exemption reason (BT-120 or BT-121) yet.
+  EN 16931 requires one for VAT categories `E`, `AE`, `K`, `G` and `O` (rules
+  BR-E-10, BR-AE-10, BR-IC-10, BR-G-10 and BR-O-10), so an invoice with a line
+  in one of those categories fails validation.
 - The connector models the core EN 16931 invoice fields. Country-specific
   extensions are accepted by the API but are not surfaced as typed fields.
 - The **Validate** result in this definition names the verdict, the detected
@@ -101,6 +105,6 @@ paconn create --api-def apiDefinition.swagger.json \
   --api-prop apiProperties.json --icon icon.png
 ```
 
-You can also import `apiDefinition.swagger.json` directly from the Power Automate
-maker portal (**Data > Custom connectors > New custom connector > Import an
-OpenAPI file**).
+Deploy with `paconn` and both files. An import of `apiDefinition.swagger.json`
+alone from the Power Automate maker portal leaves out `apiProperties.json`, which
+holds the API key connection parameter and the policy that sends the key.
