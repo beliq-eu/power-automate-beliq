@@ -420,7 +420,7 @@
         "unitPrice": { "type": "number", "x-ms-summary": "Unit price" },
         "lineTotal": { "type": "number", "x-ms-summary": "Line total" },
         "vatRate": { "type": "number", "description": "VAT rate as a percentage, e.g. 19.", "x-ms-summary": "VAT rate (%)" },
-        "vatCategoryCode": { "type": "string", "description": "VAT category code, e.g. S (standard), Z (zero), E (exempt).", "x-ms-summary": "VAT category" },
+        "vatCategoryCode": { "type": "string", "description": "VAT category code, e.g. S (standard rate) or Z (zero rated). This connector cannot carry the VAT exemption reason that categories E, AE, K, G and O require (EN 16931 BR-E-10, BR-AE-10, BR-IC-10, BR-G-10, BR-O-10), so a line in one of them fails validation.", "x-ms-summary": "VAT category" },
         "itemId": { "type": "string", "description": "Seller item identifier.", "x-ms-summary": "Item ID", "x-ms-visibility": "advanced" },
         "buyerItemId": { "type": "string", "description": "Buyer item identifier.", "x-ms-summary": "Buyer item ID", "x-ms-visibility": "advanced" }
       }
