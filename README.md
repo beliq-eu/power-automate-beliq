@@ -81,7 +81,6 @@ CI runs two offline checks on every push and pull request
 ```bash
 python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
 python scripts/check_connector.py   # definition, properties, example bodies
-bash scripts/scrub-check.sh         # no em-dash in published text
 ```
 
 `scripts/check_connector.py` validates the Swagger 2.0 document, resolves the
