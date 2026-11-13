@@ -96,7 +96,7 @@ def check_operations(swagger: dict) -> None:
         if not operation_id:
             fail(f"{where}: no operationId")
             continue
-        # Independent Publisher certification rejects an operation missing either.
+        # Microsoft's certification checklist rejects an operation missing either.
         for field in ("summary", "description"):
             if not operation.get(field):
                 fail(f"{where} ({operation_id}): no {field}")

@@ -7,10 +7,12 @@ Copilot Studio counterpart of the published
 [`n8n-nodes-beliq`](https://www.npmjs.com/package/n8n-nodes-beliq) node, built
 from the same product model.
 
-It targets the Microsoft **Independent Publisher** program, so the layout under
-`Beliq/` matches the
-[microsoft/PowerPlatformConnectors](https://github.com/microsoft/PowerPlatformConnectors)
-`independent-publisher-connectors/<Name>/` convention.
+beliq owns the API behind this connector, so a Microsoft certification goes
+through the **verified publisher** program in Partner Center. The
+Independent Publisher program is for connectors to a service the publisher
+does not own, so beliq does not use it. The connector is not submitted for certification
+yet; [Status and follow-ups](#status-and-follow-ups) says why and lists the
+steps.
 
 ## Layout
 
@@ -21,7 +23,7 @@ Beliq/
   settings.json                paconn settings (connectorId/environment filled at deploy time)
   icon.png                     connector icon (beliq mark on the brand color)
   icon.svg                     icon source
-  README.md                    connector README (ships with the IP submission)
+  README.md                    connector README, the basis of a submission's intro.md
 example-flows/                 the two Generate bodies + curl smoke commands
 ```
 
@@ -109,15 +111,31 @@ against the live API.
 Done: connector definition, properties, icon, READMEs, two Generate example
 bodies, and CI that checks all of them offline on every pull request.
 
-Not done yet (tracked as follow-ups):
+Not submitted for certification. A certified connector is reviewed and
+deployed by Microsoft, so beliq waits until its API is stable before it
+submits. Until then, import the connector as a custom connector. When beliq
+submits, the steps are, in this order:
 
-- Live import into a Power Automate environment, create a connection, run the
-  operations, and capture screenshots.
-- Smoke-test the bodies against the live API once a key and the production
-  endpoint are available.
-- Independent Publisher submission PR to `microsoft/PowerPlatformConnectors`
-  (PR titled "beliq (Independent Publisher)"; the README must include
-  screenshots of operations succeeding in flows).
+1. Open a Partner Center Seller account and pass its vetting. The Entra
+   account behind it needs an email address, or Microsoft rejects the
+   certification request.
+2. Redraw the icon to Microsoft's verified publisher rules: a square PNG
+   between 100 x 100 and 230 x 230 pixels, no rounded corners, an opaque
+   background in the brand colour `#fe6019`, and the mark under 70% of the
+   height and width. `Beliq/icon.png` is 256 x 256 today, with rounded corners
+   on `#e54d0d`.
+3. Set `iconBrandColor` in `Beliq/apiProperties.json` to `#fe6019`. Today it is
+   `#da3b01`, the colour Microsoft prescribes for independent publishers.
+4. Import the connector into a Power Platform environment, call each
+   operation successfully at least 10 times against the production host, and
+   run the Solution Checker on the connector's solution.
+5. Export the connector solution and a second solution with a test flow,
+   package both with the Package Deployer, add an `intro.md`, check the result
+   with `scripts/validate_package.py`, and submit it in Partner Center behind a
+   SAS URI that stays valid for at least 15 days.
+
+Microsoft's certification pages change, so each step starts by reading them
+again.
 
 ## License
 
