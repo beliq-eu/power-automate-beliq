@@ -6,8 +6,13 @@ differs by format:
 [`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
 needed) lists the rule pack, version and badge of each format beliq offers, and
 [How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
-explains each depth. beliq produces and checks the document; transmission,
-archiving, and tax-authority reporting stay with your access point.
+explains each depth.
+
+beliq covers three steps of an e-invoice: generate, validate, and deliver (in
+development). This connector runs the first two and also parses and converts
+documents; no action of it sends or files an invoice. Until delivery through
+beliq is available, transmission and tax-authority reporting stay with your
+access point, and archiving stays with you.
 
 ## Publisher
 

@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "beliq",
-    "description": "Validate, generate, convert and parse EU e-invoices with the beliq API. How deep a check goes differs by format: GET https://api.beliq.eu/v1/rulesets (no API key needed) lists the rule pack, version and badge of each format beliq offers, and https://docs.beliq.eu/compliance/how-verification-works/ explains each depth. beliq produces and checks the document; transmission, archiving, and tax-authority reporting stay with your access point.",
+    "description": "Validate, generate, convert and parse EU e-invoices with the beliq API. How deep a check goes differs by format: GET https://api.beliq.eu/v1/rulesets (no API key needed) lists the rule pack, version and badge of each format beliq offers, and https://docs.beliq.eu/compliance/how-verification-works/ explains each depth. beliq covers three steps of an e-invoice: generate, validate, and deliver (in development). This connector runs the first two and also parses and converts documents; no action of it sends or files an invoice. Until delivery through beliq is available, transmission and tax-authority reporting stay with your access point, and archiving stays with you.",
     "version": "1.1.0",
     "contact": {
       "name": "beliq",
