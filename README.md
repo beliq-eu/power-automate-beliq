@@ -1,7 +1,7 @@
 # power-automate-beliq
 
 A Microsoft Power Platform **custom connector** for [beliq](https://beliq.eu):
-generate, validate, parse, and convert EN 16931 e-invoices (XRechnung, ZUGFeRD,
+generate, validate, parse and convert EN 16931 e-invoices (XRechnung, ZUGFeRD,
 Factur-X, Peppol BIS, CII, UBL). This is the Power Automate / Power Apps /
 Copilot Studio counterpart of the published
 [`n8n-nodes-beliq`](https://www.npmjs.com/package/n8n-nodes-beliq) node, built

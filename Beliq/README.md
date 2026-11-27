@@ -1,6 +1,6 @@
 # beliq
 
-Validate, generate, convert and parse EU e-invoices with the
+Generate, validate, parse and convert EU e-invoices with the
 [beliq](https://beliq.eu) API through this connector. How deep a check goes
 differs by format:
 [`GET /v1/rulesets`](https://docs.beliq.eu/api-reference/rulesets/) (no API key
@@ -8,11 +8,11 @@ needed) lists the rule pack, version and badge of each format beliq offers, and
 [How verification works](https://docs.beliq.eu/compliance/how-verification-works/)
 explains each depth.
 
-beliq covers three steps of an e-invoice: generate, validate, and deliver (in
-development). This connector runs the first two and also parses and converts
-documents; no action of it sends or files an invoice. Until delivery through
-beliq is available, transmission and tax-authority reporting stay with your
-access point, and archiving stays with you.
+beliq does five things with an e-invoice: generate, validate, parse, convert
+and deliver (in development). This connector runs the first four; no action
+of it sends or files an invoice. Until delivery through beliq is available,
+transmission and tax-authority reporting stay with your access point, and
+archiving stays with you.
 
 ## Publisher
 
@@ -60,7 +60,7 @@ checked against the allowed values and otherwise has no effect.
 - **Generate** takes a JSON invoice body and returns the document as binary file
   content. Pass the output to a downstream step, for example **Create file**
   (OneDrive / SharePoint / Blob) or an email attachment.
-- **Validate**, **Parse**, and **Convert** take the raw document as the request
+- **Validate**, **Parse** and **Convert** take the raw document as the request
   body (XML or PDF file content). Map the file content from a previous step, for
   example **Get file content**. The engine detects XML versus PDF from the
   content. Validate and Parse return JSON; Convert returns the converted document
