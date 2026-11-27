@@ -9,10 +9,10 @@ API.
 | `1-generate-xrechnung.json` | Generate e-invoice | An EN 16931 invoice generated as XRechnung XML. |
 | `2-generate-facturx-pdf.json` | Generate e-invoice | The same invoice generated as a Factur-X hybrid PDF, with `verify` enabled. |
 
-The **Validate**, **Parse**, and **Convert** actions take a raw XML or PDF
+The **Validate**, **Parse** and **Convert** actions take a raw XML or PDF
 document as the body rather than JSON. The easiest source of a valid document
 is the output of **Generate e-invoice**: run the XRechnung body above, then
-feed the returned XML into Validate, Parse, or Convert. The `curl` block below
+feed the returned XML into Validate, Parse or Convert. The `curl` block below
 runs that whole chain end to end.
 
 ## Using one in a flow
